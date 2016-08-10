@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="UTF-8">
+  <title>Select2 Playground</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../node_modules/select2/dist/css/select2.css">
+</head>
+<body>
+  <h2>AJAX Select2 Dropdown with Custom Field</h2>
+  <input type="text" id="selectInput" name="selectInput"><br>
+  <a href="#" data-action="add">Add new field</a>
+  <a href="#" data-action="cancel" style="display:none">Cancel</a>
+</body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.full.min.js"></script>
+  <script>
+    (function($){
+      var addBtn = $('[data-action="add"]');
+      var cancelBtn = $('[data-action="cancel"]');
+      var data = [];
+
+      var toggleButtons = function(){
+        addBtn.toggle();
+        cancelBtn.toggle();
+      };
+
+      var initSelect = function() {
+        var initial = data.length === 0 ? ['value3'] : data;
+
+        var select = $('#selectInput')
+            .select2({ data: initial })
+            .val('value3')
+            .trigger('change');
+
+        // init data on first open
+        select.one('select2:open', function(){
+          $.getJSON('http://localhost:3000/array')
+              .then(function(resp){
+                data = resp;
+                select.select2({ data: data })
+                    .val('value3')
+                    .select2('open');
+              });
+        });
+      };
+
+      addBtn.click(function(e){
+        e.preventDefault();
+        toggleButtons();
+        $('#selectInput')
+            .select2('destroy')
+            .val('')
+            .focus();
+      });
+
+      $('[data-action="cancel"]').click(function(e){
+        e.preventDefault();
+        toggleButtons();
+        initSelect();
+      });
+
+      initSelect();
+    }(jQuery));
+  </script>
+</html>
